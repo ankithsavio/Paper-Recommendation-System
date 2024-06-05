@@ -17,5 +17,3 @@ Weekly paper recommendation system based on user preference.
     - [Bert Embedding model](https://huggingface.co/malteos/scincl)
 
 Followed by automation.
-
-Check which branch gets update (to remove)
