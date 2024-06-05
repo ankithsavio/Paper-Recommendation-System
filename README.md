@@ -14,6 +14,6 @@ Weekly paper recommendation system based on user preference.
 * Embedding model
     - [Vertex AI](https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/text_embedding_new_api.ipynb)
     - [Quantized LLMs]()
-    - [Bert Embedding model](https://huggingface.co/malteos/scincl)
+    - [Bert Embedding model](https://github.com/malteos/scincl)
 
 Followed by automation.
