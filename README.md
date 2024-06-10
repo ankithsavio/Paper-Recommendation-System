@@ -12,6 +12,7 @@ Weekly paper recommendation system based on user preference.
     - [Pinecone]()
 
 * Embedding model
+    - [Scincl](https://huggingface.co/malteos/scincl) : **Currently Used**
     - [Vertex AI](https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/text_embedding_new_api.ipynb)
     - [Quantized LLMs]()
     - [Bert Embedding model](https://github.com/malteos/scincl)
