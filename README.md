@@ -17,4 +17,7 @@ Weekly paper recommendation system based on user preference.
     - [Quantized LLMs]()
     - [Bert Embedding model](https://github.com/malteos/scincl)
 
+* Zotero API
+    - [Pyzotero](https://github.com/urschrei/pyzotero)
+
 Followed by automation.
