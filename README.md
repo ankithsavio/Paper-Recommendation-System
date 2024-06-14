@@ -18,6 +18,7 @@ Weekly paper recommendation system based on user preference.
     - [Bert Embedding model](https://github.com/malteos/scincl)
 
 * Zotero API
+    - [User Manual](https://www.zotero.org/support/dev/web_api/v3/basics)
     - [Pyzotero](https://github.com/urschrei/pyzotero)
 
 Followed by automation.
