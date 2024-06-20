@@ -11,7 +11,6 @@ checkpoint_path : Path to the model checkpoints for the scincl model
 index_name : Your desired index name for the Vector DB
 namespace_name : Your desired namspace name for the collection in the Vector DB
 """
-import numpy as np
 import pandas as pd
 import arxiv
 import requests
@@ -44,14 +43,7 @@ df = pd.DataFrame({'Title': [result.title for result in client.results(search)],
               'Date': [result.published.date().strftime('%Y-%m-%d') for result in client.results(search)],
               'id': [result.entry_id.replace('http://arxiv.org/abs/', '') for result in client.results(search)]})
 
-try :
-    df_main = pd.read_csv('arxiv-scrape.csv')
-    df_main = pd.concat([df_main, df], ignore_index= True)
-    df_main.drop_duplicates(inplace= True)
-except:
-    df_main = df.copy()
-
-df_main.to_csv('arxiv-scrape.csv', index = False)
+df.to_csv('arxiv-scrape.csv')
 
 tokenizer = AutoTokenizer.from_pretrained(checkpoint_path)
 model = AutoModel.from_pretrained(checkpoint_path)
@@ -83,7 +75,7 @@ index = pc.Index(index_name)
 feedback = index.upsert(vectors=embedding_vector,
                         namespace=namespace_name)
 
-print(f"Retrieved {len(ids)} paper from Zotero\nSuccessfull upserted {feedback['upserted_count']} embeddings in {namespace_name} namespace")
+print(f"Retrieved {len(ids)} papers from Zotero\nSuccessfully upserted {feedback['upserted_count']} embeddings in {namespace_name} namespace")
 
 
 
