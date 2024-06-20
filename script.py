@@ -26,15 +26,16 @@ df = pd.DataFrame({'Title': [result.title for result in client.results(search)],
               'Abstract': [result.summary.replace('\n', ' ') for result in client.results(search)],
               'Date': [result.published.date().strftime('%Y-%m-%d') for result in client.results(search)],
               'id': [result.entry_id for result in client.results(search)]})
-print(df.size)
-df_main = pd.read_csv('arxiv-scrape.csv')
 
+df_main = pd.read_csv('/mnt/c/Users/ankit/Desktop/Portfolio/Paper-Recommendation-System/arxiv-scrape.csv')
+df.reset_index(inplace=True)
+df.drop(columns=['index'], inplace=True)
 union_df = df.merge(df_main, how='left', indicator=True)
 df = union_df[union_df['_merge'] == 'left_only'].drop(columns=['_merge'])
-print(df.size)
+
 df_main = pd.concat([df_main, df], ignore_index= True)
 df_main.drop_duplicates(inplace= True)
-df_main.to_csv('arxiv-scrape.csv')
+df_main.to_csv('/mnt/c/Users/ankit/Desktop/Portfolio/Paper-Recommendation-System/arxiv-scrape.csv', index = False)
 
 tokenizer = AutoTokenizer.from_pretrained(checkpoint_path)
 model = AutoModel.from_pretrained(checkpoint_path)
@@ -56,7 +57,7 @@ else:
     exit()
 
 results = []
-score_threshold = 2.2
+score_threshold = 2.61
 for i,embedding in enumerate(embeddings):
     query = embedding.detach().numpy().tolist()
     result = index.query(namespace=namespace_name,vector=query,top_k=3,include_values=False)

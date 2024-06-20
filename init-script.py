@@ -43,7 +43,7 @@ df = pd.DataFrame({'Title': [result.title for result in client.results(search)],
               'Date': [result.published.date().strftime('%Y-%m-%d') for result in client.results(search)],
               'id': [result.entry_id.replace('http://arxiv.org/abs/', '') for result in client.results(search)]})
 
-df.to_csv('arxiv-scrape.csv')
+df.to_csv('/mnt/c/Users/ankit/Desktop/Portfolio/Paper-Recommendation-System/arxiv-scrape.csv', index = False)
 
 tokenizer = AutoTokenizer.from_pretrained(checkpoint_path)
 model = AutoModel.from_pretrained(checkpoint_path)
