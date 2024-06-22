@@ -8,7 +8,7 @@ ZOTERO_API_KEY : Your private Zotero API key
 ZOTERO_TAG : Desired tag from your Zotero library
 PINECONE_API_KEY : Your Pinecone API key
 CHECKPOINT_PATH : Path to the model checkpoints for the scincl model - Download it from Huggingface
-INDEX_NAME : Your desired index name for the Vector DB
+INDEX_NAME : Your desired index name for the Vector DB - WARNING : Currently set to delete if already exists.
 NAMESPACE_NAME : Your desired namspace name for the collection in the Vector DB - Project will be wokring under a single collection
 """
 import pandas as pd
@@ -19,6 +19,7 @@ import torch
 from pinecone import Pinecone, ServerlessSpec
 from config import ZOTERO_API_KEY, ZOTERO_LIBRARY_ID, ZOTERO_TAG, CHECKPOINT_PATH, PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME
 import math
+import warnings
 
 library_type = 'user'
 
@@ -60,16 +61,26 @@ embedding_vector = [{'id': df['id'][i], 'values': embeddings[i]} for i in range(
 
 pc = Pinecone(api_key = PINECONE_API_KEY)
 if INDEX_NAME in pc.list_indexes().names():
-    pc.delete_index(INDEX_NAME)
-    pc.create_index(
-        name=INDEX_NAME,
-        dimension=768,
-        metric="cosine",
-        spec=ServerlessSpec(
-            cloud='aws', 
-            region='us-east-1'
-        ) 
+    while True:
+        warnings.warn(f'Index name : {INDEX_NAME} already exists. Set a different name in your config file OR you can proceed to re-initialize the project.')
+        response = input('Do you want to proceed? [y/n]:')
+        if response.lower() == 'y':
+            pc.delete_index(INDEX_NAME)
+            break
+        elif response.lower() == 'n':
+            exit()
+        else :
+            print('Invalid input. Use [y/n].')
+            
+pc.create_index(
+    name=INDEX_NAME,
+    dimension=768,
+    metric="cosine",
+    spec=ServerlessSpec(
+        cloud='aws', 
+        region='us-east-1'
     ) 
+) 
 
 index = pc.Index(INDEX_NAME)
 feedback = index.upsert(vectors=embedding_vector,
