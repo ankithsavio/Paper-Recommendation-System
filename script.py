@@ -6,14 +6,15 @@ import pandas as pd
 import arxiv
 from transformers import AutoTokenizer, AutoModel
 from pinecone import Pinecone
-from config import pinecone_api_key, arxiv_category_name, arxiv_comment_query, checkpoint_path, index_name, namespace_name
+from config import PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, CHECKPOINT_PATH, ARXIV_CATEGORY_NAME, ARXIV_COMMENT_QUERY
+
 import torch
 import math
 
 client = arxiv.Client()
 
-category = arxiv_category_name
-comment = arxiv_comment_query
+category = ARXIV_CATEGORY_NAME
+comment = ARXIV_COMMENT_QUERY
 custom_query = f'cat:{category} AND co:{comment}'
 
 search = arxiv.Search(
@@ -27,7 +28,7 @@ df = pd.DataFrame({'Title': [result.title for result in client.results(search)],
               'Date': [result.published.date().strftime('%Y-%m-%d') for result in client.results(search)],
               'id': [result.entry_id for result in client.results(search)]})
 
-df_main = pd.read_csv('/mnt/c/Users/ankit/Desktop/Portfolio/Paper-Recommendation-System/arxiv-scrape.csv')
+df_main = pd.read_csv('arxiv-scrape.csv')
 df.reset_index(inplace=True)
 df.drop(columns=['index'], inplace=True)
 union_df = df.merge(df_main, how='left', indicator=True)
@@ -35,10 +36,10 @@ df = union_df[union_df['_merge'] == 'left_only'].drop(columns=['_merge'])
 
 df_main = pd.concat([df_main, df], ignore_index= True)
 df_main.drop_duplicates(inplace= True)
-df_main.to_csv('/mnt/c/Users/ankit/Desktop/Portfolio/Paper-Recommendation-System/arxiv-scrape.csv', index = False)
+df_main.to_csv('arxiv-scrape.csv', index = False)
 
-tokenizer = AutoTokenizer.from_pretrained(checkpoint_path)
-model = AutoModel.from_pretrained(checkpoint_path)
+tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT_PATH)
+model = AutoModel.from_pretrained(CHECKPOINT_PATH)
 
 title_abs = [title + tokenizer.sep_token + abstract for title,abstract in zip(df['Title'], df['Abstract'])]
 
@@ -49,18 +50,18 @@ for i in range(math.ceil(len(title_abs)/batch_size)):
     result = model(**inputs)
     embeddings = torch.cat((embeddings, result.last_hidden_state[:, 0, :]), dim = 0)
 
-pc = Pinecone(api_key = pinecone_api_key)
-if index_name in pc.list_indexes().names():
-    index = pc.Index(index_name)
+pc = Pinecone(api_key = PINECONE_API_KEY)
+if INDEX_NAME in pc.list_indexes().names():
+    index = pc.Index(INDEX_NAME)
 else:
-    print(f"{index_name} doesnt exist. Run init-script first.")
+    print(f"{INDEX_NAME} doesnt exist. Run init-script first.")
     exit()
 
 results = []
 score_threshold = 2.61
 for i,embedding in enumerate(embeddings):
     query = embedding.detach().numpy().tolist()
-    result = index.query(namespace=namespace_name,vector=query,top_k=3,include_values=False)
+    result = index.query(namespace=NAMESPACE_NAME,vector=query,top_k=3,include_values=False)
     sum_score = 0
     for match in result['matches']:
         sum_score += match['score'] 
