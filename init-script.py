@@ -70,7 +70,7 @@ if INDEX_NAME in pc.list_indexes().names():
         elif response.lower() == 'n':
             exit()
         else :
-            print('Invalid input. Use [y/n].')
+            print('Invalid input. Use [y/n].') 
             
 pc.create_index(
     name=INDEX_NAME,

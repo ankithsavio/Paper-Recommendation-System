@@ -3,3 +3,6 @@ config.py
 
 #ingore __pychache__
 __pycache__/
+
+#ignore gitignore
+.gitignore
