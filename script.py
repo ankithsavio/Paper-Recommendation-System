@@ -11,7 +11,7 @@ import logging
 import torch
 import math
 
-logging.basicConfig(filename='logs/logfile.log' ,level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 client = arxiv.Client()
 
