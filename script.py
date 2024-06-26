@@ -87,3 +87,4 @@ else:
         logging.info(f"Possible interesting paper : {result['id']} \nwith Average Score = {result['total_score']/3}\n")
 
 logging.info("Weekly Paper Recommendation Script Completed.")
+
