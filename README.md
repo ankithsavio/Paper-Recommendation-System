@@ -12,8 +12,13 @@ Weekly paper recommendation system based on user preference.
     - [Pinecone]()
 
 * Embedding model
+    - [Scincl](https://huggingface.co/malteos/scincl) : **Currently Used**
     - [Vertex AI](https://colab.research.google.com/github/GoogleCloudPlatform/vertex-ai-samples/blob/main/notebooks/official/generative_ai/text_embedding_new_api.ipynb)
     - [Quantized LLMs]()
-    - [Bert Embedding model](https://huggingface.co/malteos/scincl)
+    - [Bert Embedding model](https://github.com/malteos/scincl)
+
+* Zotero API
+    - [User Manual](https://www.zotero.org/support/dev/web_api/v3/basics)
+    - [Pyzotero](https://github.com/urschrei/pyzotero)
 
 Followed by automation.
