@@ -2,6 +2,8 @@
 Initialization script for the project.
 For the current state of the project, it is desirable to keep the syntax as is.
 
+Use serverless if you dont want to deploy the model locally.
+
 Pre-requisite: create an config.py
 ZOTERO_LIBRARY_ID : Your Zotero userID for use in API calls
 ZOTERO_API_KEY : Your Zotero API key

@@ -1,11 +1,13 @@
 '''
 Weekly Script to scrape the arxiv.
 Guide to creating a config file is in init-script.
+
+Use serverless if you dont want to deploy the model locally.
 '''
 import pandas as pd
 import arxiv
 from pinecone import Pinecone
-from config import PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, CHECKPOINT_PATH, ARXIV_CATEGORY_NAME, ARXIV_COMMENT_QUERY, HF_API_KEY
+from config import PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, ARXIV_CATEGORY_NAME, ARXIV_COMMENT_QUERY, HF_API_KEY
 import logging
 import requests
 import os
