@@ -10,8 +10,14 @@ from config import PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, CHECKPOINT_PATH
 import logging
 import torch
 import math
+import os
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
+logging.basicConfig(filename= 'logs/logfile.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.getLogger('arxiv').setLevel(logging.WARNING)
+logging.info("Weekly Script Started (Local)")
 
 client = arxiv.Client()
 
@@ -83,8 +89,10 @@ else:
             results.append({'id':df['id'][i], 'total_score': sum_score})
 
 
-    for result in results:
-        logging.info(f"Possible interesting paper : {result['id']} \nwith Average Score = {result['total_score']/3}\n")
+    if results:
+        logging.info(results)
+    else:
+        logging.info("No Interesting Papers")
 
 logging.info("Weekly Paper Recommendation Script Completed.")
 

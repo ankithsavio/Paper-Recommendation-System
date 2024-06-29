@@ -4,5 +4,14 @@ config.py
 #ingore __pychache__
 __pycache__/
 
+#ignore logs
+logs/
+
+#ignore jupyter notebooks
+*.ipynb
+
+#ignore csv files
+*.csv
+
 #ignore gitignore
 .gitignore
