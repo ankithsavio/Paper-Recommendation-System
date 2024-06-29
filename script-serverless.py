@@ -1,15 +1,15 @@
 '''
 Weekly Script to scrape the arxiv.
 Guide to creating a config file is in init-script.
+
+Use serverless if you dont want to deploy the model locally.
 '''
 import pandas as pd
 import arxiv
-from transformers import AutoTokenizer, AutoModel
 from pinecone import Pinecone
-from config import PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, CHECKPOINT_PATH, ARXIV_CATEGORY_NAME, ARXIV_COMMENT_QUERY
+from config import PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, ARXIV_CATEGORY_NAME, ARXIV_COMMENT_QUERY, HF_API_KEY
 import logging
-import torch
-import math
+import requests
 import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,10 +17,9 @@ os.chdir(script_dir)
 
 logging.basicConfig(filename= 'logs/logfile.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.getLogger('arxiv').setLevel(logging.WARNING)
-logging.info("Weekly Script Started (Local)")
+logging.info("Weekly Script Started (Serverless)")
 
 client = arxiv.Client()
-
 category = ARXIV_CATEGORY_NAME
 comment = ARXIV_COMMENT_QUERY
 custom_query = f'cat:{category} AND co:{comment}'
@@ -59,30 +58,28 @@ else:
     df_main.drop_duplicates(inplace= True)
     df_main.to_csv('arxiv-scrape.csv', index = False)
 
-    tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT_PATH)
-    model = AutoModel.from_pretrained(CHECKPOINT_PATH)
+    title_abs = [title + '[SEP]' + abstract for title,abstract in zip(df['Title'], df['Abstract'])]
 
-    title_abs = [title + tokenizer.sep_token + abstract for title,abstract in zip(df['Title'], df['Abstract'])]
+    API_URL = "https://api-inference.huggingface.co/models/malteos/scincl"
+    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
-    embeddings = torch.empty((0, 768))
-    batch_size = 15
-    for i in range(math.ceil(len(title_abs)/batch_size)):
-        inputs = tokenizer(title_abs[i * batch_size:(i + 1) * batch_size], padding=True, truncation=True, return_tensors="pt", max_length=512)
-        with torch.no_grad():
-            result = model(**inputs)
-        embeddings = torch.cat((embeddings, result.last_hidden_state[:, 0, :]), dim = 0)
+    response = requests.post(API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": False})
+    if response.status_code == 502:
+        response = requests.post(API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True})
+
+    embeddings = response.json()
 
     pc = Pinecone(api_key = PINECONE_API_KEY)
     if INDEX_NAME in pc.list_indexes().names():
         index = pc.Index(INDEX_NAME)
     else:
-        logging.error(f"{INDEX_NAME} doesnt exist. Run init-script first.")
+        logging.error(f"{INDEX_NAME} doesnt exist. Project isnt initialized properly")
         exit()
 
     results = []
     score_threshold = 2.61
     for i,embedding in enumerate(embeddings):
-        query = embedding.detach().numpy().tolist()
+        query = embedding[i]
         result = index.query(namespace=NAMESPACE_NAME,vector=query,top_k=3,include_values=False)
         sum_score = sum(match['score'] for match in result['matches'])
         if sum_score > score_threshold:

@@ -22,3 +22,5 @@ Weekly paper recommendation system based on user preference.
     - [Pyzotero](https://github.com/urschrei/pyzotero)
 
 Followed by automation.
+
+Integrate HuggingFace Serverless API
