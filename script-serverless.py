@@ -79,7 +79,7 @@ else:
     results = []
     score_threshold = 2.61
     for i,embedding in enumerate(embeddings):
-        query = embedding[i]
+        query = embedding
         result = index.query(namespace=NAMESPACE_NAME,vector=query,top_k=3,include_values=False)
         sum_score = sum(match['score'] for match in result['matches'])
         if sum_score > score_threshold:
