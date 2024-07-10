@@ -56,7 +56,7 @@ API_URL = "https://api-inference.huggingface.co/models/malteos/scincl"
 headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 response = requests.post(API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": False})
-if response.status_code == 502:
+if response.status_code == 503:
     response = requests.post(API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True})
 
 output = response.json()

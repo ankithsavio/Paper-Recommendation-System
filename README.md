@@ -24,3 +24,8 @@ Weekly paper recommendation system based on user preference.
 Followed by automation.
 
 Integrate HuggingFace Serverless API
+
+
+* API 
+    - [FastAPI]()
+    - [Flask]()

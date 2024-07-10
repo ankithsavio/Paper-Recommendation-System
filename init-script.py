@@ -97,5 +97,3 @@ feedback = index.upsert(vectors=embedding_vector,
 logging.info(feedback)
 logging.info(f"Retrieved {len(ids)} papers from Zotero. Successfully upserted {feedback['upserted_count']} embeddings in {NAMESPACE_NAME} namespace")
 
-
-

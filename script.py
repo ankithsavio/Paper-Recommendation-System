@@ -80,7 +80,7 @@ else:
         exit()
 
     results = []
-    score_threshold = 2.61
+    score_threshold = 2.0
     for i,embedding in enumerate(embeddings):
         query = embedding.detach().numpy().tolist()
         result = index.query(namespace=NAMESPACE_NAME,vector=query,top_k=3,include_values=False)
