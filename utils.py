@@ -106,7 +106,7 @@ def main():
 
     embeddings, dim = get_hf_embeddings(HF_API_KEY, df)
 
-    feedback = upload_to_pinecone(PINECONE_API_KEY, INDEX_NAME, NAMESPACE_NAME, embeddings, dim, df)
+    feedback = upload_to_pinecone(api_key= PINECONE_API_KEY, index= INDEX_NAME, namespace= NAMESPACE_NAME, embeddings= embeddings, dim= dim, df= df)
 
     logging.info(feedback)
     if feedback is dict:
@@ -143,7 +143,7 @@ def recommend_papers(api_key, index, namespace, embeddings, df, threshold):
         result = index.query(namespace=namespace,vector=query,top_k=3,include_values=False)
         sum_score = sum(match['score'] for match in result['matches'])
         if sum_score > score_threshold:
-            results.append(f"Paper-URL : {df['id'][i]} with score: {sum_score}")
+            results.append(f"Paper-URL : [{df['id'][i]}]({df['id'][i]}) with score: {sum_score / 3}")
 
     if results:
         return '\n'.join(results)
