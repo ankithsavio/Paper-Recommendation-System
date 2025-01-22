@@ -10,6 +10,7 @@ from pinecone import Pinecone
 import logging
 import requests
 import os
+import asyncio
 from dotenv import load_dotenv
 
 load_dotenv(".env")
@@ -85,9 +86,17 @@ else:
         API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": False}
     )
     if response.status_code == 503:
-        response = requests.post(
-            API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True}
+        response = asyncio.run(
+            asyncio.to_thread(
+                requests.post,
+                API_URL,
+                headers=headers,
+                json={"inputs": title_abs, "wait_for_model": True},
+            )
         )
+        # response = requests.post(
+        #     API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True}
+        # )
 
     embeddings = response.json()
 

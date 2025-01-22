@@ -9,13 +9,14 @@ import requests
 from pinecone import Pinecone, ServerlessSpec
 import logging
 import os
+import asyncio
 from dotenv import load_dotenv
 
 load_dotenv(".env")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
-
+os.makedirs("logs/", exist_ok=True)
 logging.basicConfig(
     filename="logs/logfile.log",
     level=logging.INFO,
@@ -70,9 +71,17 @@ response = requests.post(
     API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": False}
 )
 if response.status_code == 503:
-    response = requests.post(
-        API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True}
+    response = asyncio.run(
+        asyncio.to_thread(
+            requests.post,
+            API_URL,
+            headers=headers,
+            json={"inputs": title_abs, "wait_for_model": True},
+        )
     )
+    # response = requests.post(
+    #     API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True}
+    # )
 
 output = response.json()
 embedding_vector = [
