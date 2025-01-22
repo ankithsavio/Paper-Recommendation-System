@@ -4,6 +4,7 @@ import requests
 from pinecone import Pinecone, ServerlessSpec
 import logging
 import os
+import asyncio
 from dotenv import load_dotenv
 
 load_dotenv(".env")
@@ -82,9 +83,17 @@ def get_hf_embeddings(api_key, df):
     )
     print(str(response.status_code) + "This part needs an update, causing KeyError 0")
     if response.status_code == 503:
-        response = requests.post(
-            API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True}
+        response = asyncio.run(
+            asyncio.to_thread(
+                requests.post,
+                API_URL,
+                headers=headers,
+                json={"inputs": title_abs, "wait_for_model": True},
+            )
         )
+        # response = requests.post(
+        #     API_URL, headers=headers, json={"inputs": title_abs, "wait_for_model": True}
+        # )
 
     embeddings = response.json()
 
@@ -124,17 +133,21 @@ def main():
     logging.getLogger("arxiv").setLevel(logging.WARNING)
     logging.info("Project Initialization Script Started (Serverless)")
 
-    ids = get_zotero_ids(os.getenv('ZOTERO_API_KEY'), os.getenv('ZOTERO_LIBRARY_ID'), os.getenv('ZOTERO_TAG'))
+    ids = get_zotero_ids(
+        os.getenv("ZOTERO_API_KEY"),
+        os.getenv("ZOTERO_LIBRARY_ID"),
+        os.getenv("ZOTERO_TAG"),
+    )
     print(ids)
 
     df = get_arxiv_papers(ids=ids)
 
-    embeddings, dim = get_hf_embeddings(os.getenv('HF_API_KEY'), df)
+    embeddings, dim = get_hf_embeddings(os.getenv("HF_API_KEY"), df)
 
     feedback = upload_to_pinecone(
-        api_key=os.getenv('PINECONE_API_KEY'),
-        index=os.getenv('INDEX_NAME'),
-        namespace=os.getenv('NAMESPACE_NAME'),
+        api_key=os.getenv("PINECONE_API_KEY"),
+        index=os.getenv("INDEX_NAME"),
+        namespace=os.getenv("NAMESPACE_NAME"),
         embeddings=embeddings,
         dim=dim,
         df=df,
@@ -192,17 +205,25 @@ def recommend_papers(api_key, index, namespace, embeddings, df, threshold):
 def recs(threshold):
     logging.info("Weekly Script Started (Serverless)")
 
-    df = get_arxiv_papers(category=os.getenv('ARXIV_CATEGORY_NAME'), comment=os.getenv('ARXIV_COMMENT_QUERY'))
+    df = get_arxiv_papers(
+        category=os.getenv("ARXIV_CATEGORY_NAME"),
+        comment=os.getenv("ARXIV_COMMENT_QUERY"),
+    )
 
     df = get_new_papers(df)
 
     if not isinstance(df, pd.DataFrame):
         return df
 
-    embeddings, _ = get_hf_embeddings(os.getenv('HF_API_KEY'), df)
+    embeddings, _ = get_hf_embeddings(os.getenv("HF_API_KEY"), df)
 
     results = recommend_papers(
-        os.getenv('PINECONE_API_KEY'), os.getenv('INDEX_NAME'), os.getenv('NAMESPACE_NAME'), embeddings, df, threshold
+        os.getenv("PINECONE_API_KEY"),
+        os.getenv("INDEX_NAME"),
+        os.getenv("NAMESPACE_NAME"),
+        embeddings,
+        df,
+        threshold,
     )
 
     return results

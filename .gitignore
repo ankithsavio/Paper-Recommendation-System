@@ -17,3 +17,5 @@ logs/
 .gitignore
 
 .env
+
+.gradio
